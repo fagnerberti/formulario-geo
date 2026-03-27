@@ -1,954 +1,890 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulário de Uso de Dados Geoespaciais</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #f0f4f0;
-      --surface: #ffffff;
-      --surface2: #f7faf7;
-      --border: #d0ddd0;
-      --border-focus: #2d7a4f;
-      --accent: #2d7a4f;
-      --accent-light: #e6f4ec;
-      --accent-dark: #1a5235;
-      --text: #1a2e1a;
-      --text-muted: #5a7a5a;
-      --text-light: #8aaa8a;
-      --shadow: 0 2px 12px rgba(45, 122, 79, 0.08);
-      --shadow-lg: 0 8px 40px rgba(45, 122, 79, 0.14);
-      --radius: 14px;
-      --radius-sm: 8px;
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 48px 16px 80px;
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(45, 122, 79, 0.07) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 90%, rgba(45, 122, 79, 0.05) 0%, transparent 50%);
-    }
-
-    .card {
-      width: 100%;
-      max-width: 680px;
-      background: var(--surface);
-      border-radius: 20px;
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-      animation: slideUp 0.5s cubic-bezier(.22, .68, 0, 1.2) both;
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(32px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .header {
-      background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
-      padding: 40px 40px 36px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -40px;
-      right: -40px;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .header::after {
-      content: '';
-      position: absolute;
-      bottom: -60px;
-      left: 30%;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .header-icon {
-      width: 52px;
-      height: 52px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    .header h1 {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.3;
-      position: relative;
-      z-index: 1;
-    }
-
-    .header p {
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-      font-weight: 300;
-      position: relative;
-      z-index: 1;
-    }
-
-    .body {
-      padding: 40px;
-    }
-
-    .field {
-      margin-bottom: 28px;
-      animation: fadeIn 0.4s ease both;
-      position: static;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .field:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-
-    .field:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .field:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    label {
-      display: block;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 10px;
-    }
-
-    label span.req {
-      color: var(--accent);
-      margin-left: 3px;
-    }
-
-    .hint {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      font-weight: 300;
-      margin-bottom: 10px;
-      margin-top: -4px;
-    }
-
-    /* ── Autocomplete ── */
-    .autocomplete-wrap {
-      position: relative;
-      z-index: 200;
-    }
-
-    .autocomplete-wrap input {
-      width: 100%;
-      padding: 13px 40px 13px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      color: var(--text);
-      background: var(--surface2);
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      outline: none;
-    }
-
-    .autocomplete-wrap input:focus {
-      border-color: var(--border-focus);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(45, 122, 79, 0.1);
-    }
-
-    .autocomplete-wrap input.valid {
-      border-color: var(--accent);
-      background: var(--accent-light);
-    }
-
-    .clear-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-light);
-      font-size: 18px;
-      line-height: 1;
-      display: none;
-      padding: 2px;
-      transition: color 0.15s;
-    }
-
-    .clear-btn:hover {
-      color: var(--text);
-    }
-
-    .dropdown {
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-lg);
-      max-height: 260px;
-      overflow-y: auto;
-      z-index: 9999;
-      display: none;
-    }
-
-    .dropdown.open {
-      display: block;
-    }
-
-    .dropdown-group {
-      padding: 6px 0;
-    }
-
-    .dropdown-group-label {
-      padding: 6px 14px 4px;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-light);
-    }
-
-    .dropdown-item {
-      padding: 10px 16px;
-      font-size: 0.9rem;
-      color: var(--text);
-      cursor: pointer;
-      transition: background 0.1s;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .dropdown-item:hover,
-    .dropdown-item.active {
-      background: var(--accent-light);
-      color: var(--accent-dark);
-    }
-
-    .dropdown-item .item-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-      opacity: 0.5;
-    }
-
-    .dropdown-item:hover .item-dot,
-    .dropdown-item.active .item-dot {
-      opacity: 1;
-    }
-
-    .dropdown-empty {
-      padding: 16px;
-      text-align: center;
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    /* ── Radio cards ── */
-    .radio-group {
-      display: grid;
-      gap: 10px;
-    }
-
-    .radio-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-      background: var(--surface2);
-      user-select: none;
-    }
-
-    .radio-card:hover {
-      border-color: var(--accent);
-      background: #fff;
-    }
-
-    .radio-card input[type="radio"] {
-      display: none;
-    }
-
-    .radio-card.selected {
-      border-color: var(--accent);
-      background: var(--accent-light);
-      box-shadow: 0 0 0 3px rgba(45, 122, 79, 0.1);
-    }
-
-    .radio-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: border-color 0.2s;
-    }
-
-    .radio-card.selected .radio-dot {
-      border-color: var(--accent);
-    }
-
-    .radio-dot::after {
-      content: '';
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      transform: scale(0);
-      transition: transform 0.2s cubic-bezier(.22, .68, 0, 1.4);
-    }
-
-    .radio-card.selected .radio-dot::after {
-      transform: scale(1);
-    }
-
-    .radio-label {
-      font-size: 0.92rem;
-      color: var(--text);
-      line-height: 1.4;
-    }
-
-    .radio-card.selected .radio-label {
-      color: var(--accent-dark);
-      font-weight: 500;
-    }
-
-    .radio-icon {
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      opacity: 0.7;
-    }
-
-    .radio-card.selected .radio-icon {
-      opacity: 1;
-    }
-
-    /* ── Textarea ── */
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 13px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      color: var(--text);
-      background: var(--surface2);
-      resize: vertical;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      outline: none;
-      line-height: 1.6;
-    }
-
-    textarea:focus {
-      border-color: var(--border-focus);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(45, 122, 79, 0.1);
-    }
-
-    /* ── Submit ── */
-    .submit-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.03em;
-      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(45, 122, 79, 0.3);
-      margin-top: 8px;
-    }
-
-    .submit-btn:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(45, 122, 79, 0.4);
-    }
-
-    .submit-btn:active {
-      transform: translateY(0);
-    }
-
-    /* ── Success ── */
-    .success-msg {
-      display: none;
-      text-align: center;
-      padding: 32px 24px;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .success-msg .check {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--accent-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 28px;
-    }
-
-    .success-msg h2 {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.2rem;
-      color: var(--accent-dark);
-      margin-bottom: 8px;
-    }
-
-    .success-msg p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    /* ── Error ── */
-    .error-msg {
-      font-size: 0.8rem;
-      color: #c0392b;
-      margin-top: 6px;
-      display: none;
-    }
-
-    .field.has-error input,
-    .field.has-error textarea {
-      border-color: #e74c3c;
-    }
-
-    .field.has-error .error-msg {
-      display: block;
-    }
-
-    /* ── Divider ── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 32px 0;
-    }
-
-    /* ── Scrollbar ── */
-    .dropdown::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .dropdown::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .dropdown::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário de Uso de Dados Geoespaciais</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f0;
+    --surface: #ffffff;
+    --surface2: #f7faf7;
+    --border: #d0ddd0;
+    --border-focus: #2d7a4f;
+    --accent: #2d7a4f;
+    --accent-light: #e6f4ec;
+    --accent-dark: #1a5235;
+    --text: #1a2e1a;
+    --text-muted: #5a7a5a;
+    --text-light: #8aaa8a;
+    --shadow: 0 2px 12px rgba(45,122,79,0.08);
+    --shadow-lg: 0 8px 40px rgba(45,122,79,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px 80px;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(45,122,79,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(45,122,79,0.05) 0%, transparent 50%);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: slideUp 0.5s cubic-bezier(.22,.68,0,1.2) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+    padding: 40px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .header-icon {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header p {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+  }
+
+  .body {
+    padding: 40px;
+  }
+
+  .field {
+    margin-bottom: 28px;
+    animation: fadeIn 0.4s ease both;
+    position: static;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .field:nth-child(1) { animation-delay: 0.1s; }
+  .field:nth-child(2) { animation-delay: 0.2s; }
+  .field:nth-child(3) { animation-delay: 0.3s; }
+
+  label {
+    display: block;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  label span.req {
+    color: var(--accent);
+    margin-left: 3px;
+  }
+
+  .hint {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 10px;
+    margin-top: -4px;
+  }
+
+  /* ── Autocomplete ── */
+  .autocomplete-wrap {
+    position: relative;
+    z-index: 200;
+  }
+
+  .autocomplete-wrap input {
+    width: 100%;
+    padding: 13px 40px 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--surface2);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+  }
+
+  .autocomplete-wrap input:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(45,122,79,0.1);
+  }
+
+  .autocomplete-wrap input.valid {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    font-size: 18px;
+    line-height: 1;
+    display: none;
+    padding: 2px;
+    transition: color 0.15s;
+  }
+
+  .clear-btn:hover { color: var(--text); }
+
+  .dropdown {
+    top: calc(100% + 6px);
+    left: 0; right: 0;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+  }
+
+  .dropdown.open { display: block; }
+
+  .dropdown-group {
+    padding: 6px 0;
+  }
+
+  .dropdown-group-label {
+    padding: 6px 14px 4px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-light);
+  }
+
+  .dropdown-item {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.1s;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .dropdown-item:hover, .dropdown-item.active {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+  }
+
+  .dropdown-item .item-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .dropdown-item:hover .item-dot,
+  .dropdown-item.active .item-dot { opacity: 1; }
+
+  .dropdown-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── Radio cards ── */
+  .radio-group {
+    display: grid;
+    gap: 10px;
+  }
+
+  .radio-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    background: var(--surface2);
+    user-select: none;
+  }
+
+  .radio-card:hover {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .radio-card input[type="radio"] { display: none; }
+
+  .radio-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(45,122,79,0.1);
+  }
+
+  .radio-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+
+  .radio-card.selected .radio-dot {
+    border-color: var(--accent);
+  }
+
+  .radio-dot::after {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: scale(0);
+    transition: transform 0.2s cubic-bezier(.22,.68,0,1.4);
+  }
+
+  .radio-card.selected .radio-dot::after { transform: scale(1); }
+
+  .radio-label {
+    font-size: 0.92rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .radio-card.selected .radio-label {
+    color: var(--accent-dark);
+    font-weight: 500;
+  }
+
+  .radio-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .radio-card.selected .radio-icon { opacity: 1; }
+
+  /* ── Textarea ── */
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--surface2);
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+    line-height: 1.6;
+  }
+
+  textarea:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(45,122,79,0.1);
+  }
+
+  /* ── Submit ── */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(45,122,79,0.3);
+    margin-top: 8px;
+  }
+
+  .submit-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(45,122,79,0.4);
+  }
+
+  .submit-btn:active { transform: translateY(0); }
+
+  /* ── Success ── */
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 32px 24px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .success-msg .check {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+
+  .success-msg h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.2rem;
+    color: var(--accent-dark);
+    margin-bottom: 8px;
+  }
+
+  .success-msg p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Error ── */
+  .error-msg {
+    font-size: 0.8rem;
+    color: #c0392b;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .field.has-error input,
+  .field.has-error textarea {
+    border-color: #e74c3c;
+  }
+
+  .field.has-error .error-msg { display: block; }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── Scrollbar ── */
+  .dropdown::-webkit-scrollbar { width: 6px; }
+  .dropdown::-webkit-scrollbar-track { background: transparent; }
+  .dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
 </head>
-
 <body>
 
-  <div class="card">
-    <div class="header">
-      <div class="header-icon">🗺️</div>
-      <h1>Formulário de Uso de<br>Dados Geoespaciais</h1>
-      <p>Preencha os campos abaixo para registrar o uso de dados geoespaciais na sua estrutura.</p>
-    </div>
-
-    <div class="body" id="formBody">
-
-      <!-- Campo 1: Estrutura organizacional -->
-      <div class="field" id="field-estrutura">
-        <label>Estrutura Organizacional <span class="req">*</span></label>
-        <p class="hint">Digite para buscar e selecione uma opção da lista.</p>
-        <div class="autocomplete-wrap">
-          <input type="text" id="estruturaInput" placeholder="Pesquisar estrutura…" autocomplete="off">
-          <button class="clear-btn" id="clearBtn" title="Limpar">✕</button>
-          <div class="dropdown" id="dropdown"></div>
-        </div>
-        <span class="error-msg">Selecione uma estrutura válida da lista.</span>
-      </div>
-
-      <hr class="divider">
-
-      <!-- Campo 2: Tipo de uso -->
-      <div class="field" id="field-uso">
-        <label>Tipo de Uso <span class="req">*</span></label>
-        <p class="hint">Selecione a opção que melhor descreve sua relação com dados geoespaciais.</p>
-        <div class="radio-group">
-          <label class="radio-card" onclick="selectRadio(this, 'consome')">
-            <input type="radio" name="uso" value="consome">
-            <span class="radio-icon">📥</span>
-            <div class="radio-dot"></div>
-            <span class="radio-label">Consome dados geoespaciais</span>
-          </label>
-          <label class="radio-card" onclick="selectRadio(this, 'produz')">
-            <input type="radio" name="uso" value="produz">
-            <span class="radio-icon">📤</span>
-            <div class="radio-dot"></div>
-            <span class="radio-label">Produz dados geoespaciais</span>
-          </label>
-          <label class="radio-card" onclick="selectRadio(this, 'interesse-produzir')">
-            <input type="radio" name="uso" value="interesse-produzir">
-            <span class="radio-icon">🌱</span>
-            <div class="radio-dot"></div>
-            <span class="radio-label">Tem interesse em produzir dados geoespaciais</span>
-          </label>
-          <label class="radio-card" onclick="selectRadio(this, 'interesse-utilizar')">
-            <input type="radio" name="uso" value="interesse-utilizar">
-            <span class="radio-icon">🔍</span>
-            <div class="radio-dot"></div>
-            <span class="radio-label">Interesse em utilizar dados geoespaciais</span>
-          </label>
-        </div>
-        <span class="error-msg" id="uso-error">Selecione um tipo de uso.</span>
-      </div>
-
-      <hr class="divider">
-
-      <!-- Campo 3: Descrição de uso -->
-      <div class="field" id="field-descricao">
-        <label>Descrição de Uso <span class="req">*</span></label>
-        <p class="hint">Descreva como sua estrutura utiliza ou pretende utilizar dados geoespaciais.</p>
-        <textarea id="descricaoInput"
-          placeholder="Descreva aqui o contexto, finalidade ou detalhes sobre o uso dos dados geoespaciais…"></textarea>
-        <span class="error-msg">Por favor, preencha a descrição de uso.</span>
-      </div>
-
-      <button class="submit-btn" onclick="submitForm()">Enviar Formulário →</button>
-    </div>
-
-    <div class="success-msg" id="successMsg">
-      <div class="check">✅</div>
-      <h2>Formulário enviado com sucesso!</h2>
-      <p>Suas informações foram registradas.<br>Obrigado pela participação.</p>
-    </div>
+<div class="card">
+  <div class="header">
+    <div class="header-icon">🗺️</div>
+    <h1>Formulário de Uso de<br>Dados Geoespaciais</h1>
+    <p>Preencha os campos abaixo para registrar o uso de dados geoespaciais na sua estrutura.</p>
   </div>
 
-  <script>
-    const estruturas = {
-      "DIRETORIA": [
-        "Administrativa",
-        "Coordenação",
-        "Financeira",
-        "Jurídica",
-        "Técnica"
-      ],
-      "SUPERINTENDÊNCIA": [
-        "Assessoria de Planejamento e Coordenação",
-        "Assessoria da Diretoria Jurídica",
-        "Assessoria de Planejamento e Coordenação",
-        "Assessoria de Planjemento e Coordenação",
-        "Assessoria Fiscal e Tributária",
-        "Assistência da Diretoria",
-        "Assistência da Diretoria Jurídica",
-        "Comitê de Relações Trabalhistas",
-        "Superintendência de Administração Financeira",
-        "Superintendência de Compras",
-        "Superintendência de Engenharia",
-        "Superintendência de Gestão Ambiental",
-        "Superintendência de Informática",
-        "Superintendência de Manutenção",
-        "Superintendência de Materiais",
-        "Superintendência de Obras",
-        "Superintendência de Obras e Desenvolvimento",
-        "Superintendência de Operação",
-        "Superintendência de Orçamento e Contabilidade",
-        "Superintendência de Recursos Humanos",
-        "Superintendência de Segurança Empresarial",
-        "Superintendência de Serviços Gerais"
-      ],
-      "DEPARTAMENTO": [
-        "Departamento de Armazenagem",
-        "Departamento de Contabilidade",
-        "Departamento de Controle de Contratos",
-        "Departamento de Coordenação de Segurança",
-        "Departamento de Desenvolvimento de Recursos Humanos",
-        "Departamento de Desenvolvimento e Manutenção de Sistemas",
-        "Departamento de Direito Ambiental",
-        "Departamento de Engenharia de Manutenção",
-        "Departamento de Engenharia de Segurança e Medicina do Trabalho",
-        "Departamento de Engenharia Eletrônica e Eletromecânica",
-        "Departamento de Gestão de Compras",
-        "Departamento de Gestão de Estoques",
-        "Departamento de Gestão de Recursos",
-        "Departamento de Gestão de Recursos Humanos",
-        "Departamento de Gestão Orçamentária e Estudos Econômico-Financeiros",
-        "Departamento de Infraestrutura",
-        "Departamento de Interação Regional",
-        "Departamento de Licitações e Contratos",
-        "Departamento de Manutenção",
-        "Departamento de Obras da Central",
-        "Departamento de Obras e Manutenção",
-        "Departamento de Operação da Usina e Subestações",
-        "Departamento de Operação de Segurança",
-        "Departamento de Operação do Sistema",
-        "Departamento de Patrimônio Imobiliário",
-        "Departamento de Planejamento de Sistemas e Administração de Dados",
-        "Departamento de Planejamento de Suprimentos",
-        "Departamento de Planejamento e Gestão",
-        "Departamento de Produção e Suporte Técnico",
-        "Departamento de Proteção Ambiental",
-        "Departamento de Reservatório e Áreas Protegidas",
-        "Departamento de Serviços Gerais",
-        "Departamento de Teleprocessamento e Microinformática",
-        "Departamento e Engenharia Civil e Arquitetura",
-        "Departamento Trabalhista e Tributário"
-      ],
-      "DIVISÃO": [
-        "Divisão Central de Recepção de Pedidos de Suprimentos",
-        "Divisão de Ação Ambiental",
-        "Divisão de Acompanhamento da Execução Orçamentária",
-        "Divisão de Administração de Benefícios",
-        "Divisão de Administração de Dados",
-        "Divisão de Almoxarifados",
-        "Divisão de Análise Contábil",
-        "Divisão de Análise de Contratos",
-        "Divisão de Apoio à Segurança",
-        "Divisão de Áreas Protegidas",
-        "Divisão de Arquivo Técnico",
-        "Divisão de Bens Patrimoniais e Alienações",
-        "Divisão de Cadastro e Administração de Fornecedores",
-        "Divisão de Compras",
-        "Divisão de Contabilidade Geral",
-        "Divisão de Controle da Dotação Orçamentária",
-        "Divisão de Controle de Custos e Patrimônio",
-        "Divisão de Controle de Faturamento e Encargos",
-        "Divisão de Controle Econômico-Financeiro de Contratos",
-        "Divisão de Desenvolvimento de Recursos Humanos",
-        "Divisão de Educação Ambiental",
-        "Divisão de Engenharia Civil e Arquitetura",
-        "Divisão de Engenharia de Manutenção Elétrica",
-        "Divisão de Engenharia de Manutenção Eletrônica",
-        "Divisão de Engenharia de Manutenção Mecânica",
-        "Divisão de Engenharia de Segurança do Trabalho",
-        "Divisão de Engenharia Eletromecânica",
-        "Divisão de Engenharia Eletrônica e Sistemas de Controle",
-        "Divisão de Estoques",
-        "Divisão de Estudos",
-        "Divisão de Estudos Elétricos e Normas",
-        "Divisão de Estudos Hidrológicos e Energéticos",
-        "Divisão de Estudos Tarifários e Análise Econômico-Financeira",
-        "Divisão de Estudos, Normas, Programação e Estatística",
-        "Divisão de Gestão de Contratos",
-        "Divisão de Infraestrutura",
-        "Divisão de Infraestrutura e Manutenção",
-        "Divisão de Inspeção",
-        "Divisão de Laboratório",
-        "Divisão de Manutenção Civil e Industrial",
-        "Divisão de Manutenção de Equipamentos de Geração",
-        "Divisão de Manutenção de Equipamentos de Transmissão",
-        "Divisão de Manutenção Eletrônica",
-        "Divisão de Manutenção Mecânica de Serviços Auxiliares",
-        "Divisão de Manutenção Mecânica de Unidades Geradoras",
-        "Divisão de Medicina do Trabalho",
-        "Divisão de Microinformática",
-        "Divisão de Montagem Eletromecânica",
-        "Divisão de Obras Civis",
-        "Divisão de Operação da Usina e Subestações",
-        "Divisão de Operação do Sistema",
-        "Divisão de Operações Financeiras",
-        "Divisão de Planejamento de Compras",
-        "Divisão de Planejamento de Infraestrutura",
-        "Divisão de Planejamento de Sistemas",
-        "Divisão de Planejamento e Atividades Especiais",
-        "Divisão de Planejamento e Controle",
-        "Divisão de Produção",
-        "Divisão de Programação e Controle da Produção",
-        "Divisão de Programação e Controle de Produção",
-        "Divisão de Programação e Estatística",
-        "Divisão de Remuneração e Movimentação de Recursos Humanos",
-        "Divisão de Reservatório",
-        "Divisão de Segurança da Central",
-        "Divisão de Segurança Externa",
-        "Divisão de Seleção e Acompanhamento de Recursos Humanos",
-        "Divisão de Serviços",
-        "Divisão de Serviços Gerais",
-        "Divisão de Sistemas I",
-        "Divisão de Sistemas II",
-        "Divisão de Sistematização da Manutenção",
-        "Divisão de Suporte Técnico",
-        "Divisão de Tecnologia de Materiais",
-        "Divisão de Telecomunicações",
-        "Divisão de Teleprocessamento",
-        "Divisão de Transportes",
-        "Divisão Regional de Recursos Humanos",
-        "Divisão Regional de Serviços Gerais",
-        "Órgão Regional de Compras",
-        "Órgão Regional de Finanças"
-      ]
-    };
+  <div class="body" id="formBody">
 
-    let selectedEstrutura = null;
-    let activeIndex = -1;
-    let filteredItems = [];
+    <!-- Campo 1: Estrutura organizacional -->
+    <div class="field" id="field-estrutura">
+      <label>Estrutura Organizacional <span class="req">*</span></label>
+      <p class="hint">Digite para buscar e selecione uma opção da lista.</p>
+      <div class="autocomplete-wrap">
+        <input type="text" id="estruturaInput" placeholder="Pesquisar estrutura…" autocomplete="off">
+        <button class="clear-btn" id="clearBtn" title="Limpar">✕</button>
+        <div class="dropdown" id="dropdown"></div>
+      </div>
+      <span class="error-msg">Selecione uma estrutura válida da lista.</span>
+    </div>
 
-    const input = document.getElementById('estruturaInput');
-    const dropdown = document.getElementById('dropdown');
-    const clearBtn = document.getElementById('clearBtn');
+    <hr class="divider">
 
-    function normalize(str) {
-      return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
+    <!-- Campo 2: Tipo de uso -->
+    <div class="field" id="field-uso">
+      <label>Tipo de Uso <span class="req">*</span></label>
+      <p class="hint">Selecione a opção que melhor descreve sua relação com dados geoespaciais.</p>
+      <div class="radio-group">
+        <label class="radio-card" onclick="selectRadio(this, 'consome')">
+          <input type="radio" name="uso" value="consome">
+          <span class="radio-icon">📥</span>
+          <div class="radio-dot"></div>
+          <span class="radio-label">Consome dados geoespaciais</span>
+        </label>
+        <label class="radio-card" onclick="selectRadio(this, 'produz')">
+          <input type="radio" name="uso" value="produz">
+          <span class="radio-icon">📤</span>
+          <div class="radio-dot"></div>
+          <span class="radio-label">Produz dados geoespaciais</span>
+        </label>
+        <label class="radio-card" onclick="selectRadio(this, 'interesse-produzir')">
+          <input type="radio" name="uso" value="interesse-produzir">
+          <span class="radio-icon">🌱</span>
+          <div class="radio-dot"></div>
+          <span class="radio-label">Tem interesse em produzir dados geoespaciais</span>
+        </label>
+        <label class="radio-card" onclick="selectRadio(this, 'interesse-utilizar')">
+          <input type="radio" name="uso" value="interesse-utilizar">
+          <span class="radio-icon">🔍</span>
+          <div class="radio-dot"></div>
+          <span class="radio-label">Interesse em utilizar dados geoespaciais</span>
+        </label>
+      </div>
+      <span class="error-msg" id="uso-error">Selecione um tipo de uso.</span>
+    </div>
 
-    function renderDropdown(query) {
-      dropdown.innerHTML = '';
-      filteredItems = [];
-      const q = normalize(query.trim());
+    <hr class="divider">
 
-      for (const [group, items] of Object.entries(estruturas)) {
-        const matched = q === ''
-          ? items
-          : items.filter(i => normalize(i).includes(q));
+    <!-- Campo 3: Descrição de uso -->
+    <div class="field" id="field-descricao">
+      <label>Descrição de Uso <span class="req">*</span></label>
+      <p class="hint">Descreva como sua estrutura utiliza ou pretende utilizar dados geoespaciais.</p>
+      <textarea id="descricaoInput" placeholder="Descreva aqui o contexto, finalidade ou detalhes sobre o uso dos dados geoespaciais…"></textarea>
+      <span class="error-msg">Por favor, preencha a descrição de uso.</span>
+    </div>
 
-        if (matched.length === 0) continue;
+    <button class="submit-btn" onclick="submitForm()">Enviar Formulário →</button>
+  </div>
 
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'dropdown-group';
+  <div class="success-msg" id="successMsg">
+    <div class="check">✅</div>
+    <h2>Formulário enviado com sucesso!</h2>
+    <p>Suas informações foram registradas.<br>Obrigado pela participação.</p>
+  </div>
+</div>
 
-        const groupLabel = document.createElement('div');
-        groupLabel.className = 'dropdown-group-label';
-        groupLabel.textContent = group;
-        groupDiv.appendChild(groupLabel);
+<script>
+const estruturas = {
+  "DIRETORIA": [
+    "Administrativa",
+    "Coordenação",
+    "Financeira",
+    "Jurídica",
+    "Técnica"
+  ],
+  "SUPERINTENDÊNCIA": [
+    "Assessoria de Planejamento e Coordenação",
+    "Assessoria da Diretoria Jurídica",
+    "Assessoria de Planejamento e Coordenação",
+    "Assessoria de Planjemento e Coordenação",
+    "Assessoria Fiscal e Tributária",
+    "Assistência da Diretoria",
+    "Assistência da Diretoria Jurídica",
+    "Comitê de Relações Trabalhistas",
+    "Superintendência de Administração Financeira",
+    "Superintendência de Compras",
+    "Superintendência de Engenharia",
+    "Superintendência de Gestão Ambiental",
+    "Superintendência de Informática",
+    "Superintendência de Manutenção",
+    "Superintendência de Materiais",
+    "Superintendência de Obras",
+    "Superintendência de Obras e Desenvolvimento",
+    "Superintendência de Operação",
+    "Superintendência de Orçamento e Contabilidade",
+    "Superintendência de Recursos Humanos",
+    "Superintendência de Segurança Empresarial",
+    "Superintendência de Serviços Gerais"
+  ],
+  "DEPARTAMENTO": [
+    "Departamento de Armazenagem",
+    "Departamento de Contabilidade",
+    "Departamento de Controle de Contratos",
+    "Departamento de Coordenação de Segurança",
+    "Departamento de Desenvolvimento de Recursos Humanos",
+    "Departamento de Desenvolvimento e Manutenção de Sistemas",
+    "Departamento de Direito Ambiental",
+    "Departamento de Engenharia de Manutenção",
+    "Departamento de Engenharia de Segurança e Medicina do Trabalho",
+    "Departamento de Engenharia Eletrônica e Eletromecânica",
+    "Departamento de Gestão de Compras",
+    "Departamento de Gestão de Estoques",
+    "Departamento de Gestão de Recursos",
+    "Departamento de Gestão de Recursos Humanos",
+    "Departamento de Gestão Orçamentária e Estudos Econômico-Financeiros",
+    "Departamento de Infraestrutura",
+    "Departamento de Interação Regional",
+    "Departamento de Licitações e Contratos",
+    "Departamento de Manutenção",
+    "Departamento de Obras da Central",
+    "Departamento de Obras e Manutenção",
+    "Departamento de Operação da Usina e Subestações",
+    "Departamento de Operação de Segurança",
+    "Departamento de Operação do Sistema",
+    "Departamento de Patrimônio Imobiliário",
+    "Departamento de Planejamento de Sistemas e Administração de Dados",
+    "Departamento de Planejamento de Suprimentos",
+    "Departamento de Planejamento e Gestão",
+    "Departamento de Produção e Suporte Técnico",
+    "Departamento de Proteção Ambiental",
+    "Departamento de Reservatório e Áreas Protegidas",
+    "Departamento de Serviços Gerais",
+    "Departamento de Teleprocessamento e Microinformática",
+    "Departamento e Engenharia Civil e Arquitetura",
+    "Departamento Trabalhista e Tributário"
+  ],
+  "DIVISÃO": [
+    "Divisão Central de Recepção de Pedidos de Suprimentos",
+    "Divisão de Ação Ambiental",
+    "Divisão de Acompanhamento da Execução Orçamentária",
+    "Divisão de Administração de Benefícios",
+    "Divisão de Administração de Dados",
+    "Divisão de Almoxarifados",
+    "Divisão de Análise Contábil",
+    "Divisão de Análise de Contratos",
+    "Divisão de Apoio à Segurança",
+    "Divisão de Áreas Protegidas",
+    "Divisão de Arquivo Técnico",
+    "Divisão de Bens Patrimoniais e Alienações",
+    "Divisão de Cadastro e Administração de Fornecedores",
+    "Divisão de Compras",
+    "Divisão de Contabilidade Geral",
+    "Divisão de Controle da Dotação Orçamentária",
+    "Divisão de Controle de Custos e Patrimônio",
+    "Divisão de Controle de Faturamento e Encargos",
+    "Divisão de Controle Econômico-Financeiro de Contratos",
+    "Divisão de Desenvolvimento de Recursos Humanos",
+    "Divisão de Educação Ambiental",
+    "Divisão de Engenharia Civil e Arquitetura",
+    "Divisão de Engenharia de Manutenção Elétrica",
+    "Divisão de Engenharia de Manutenção Eletrônica",
+    "Divisão de Engenharia de Manutenção Mecânica",
+    "Divisão de Engenharia de Segurança do Trabalho",
+    "Divisão de Engenharia Eletromecânica",
+    "Divisão de Engenharia Eletrônica e Sistemas de Controle",
+    "Divisão de Estoques",
+    "Divisão de Estudos",
+    "Divisão de Estudos Elétricos e Normas",
+    "Divisão de Estudos Hidrológicos e Energéticos",
+    "Divisão de Estudos Tarifários e Análise Econômico-Financeira",
+    "Divisão de Estudos, Normas, Programação e Estatística",
+    "Divisão de Gestão de Contratos",
+    "Divisão de Infraestrutura",
+    "Divisão de Infraestrutura e Manutenção",
+    "Divisão de Inspeção",
+    "Divisão de Laboratório",
+    "Divisão de Manutenção Civil e Industrial",
+    "Divisão de Manutenção de Equipamentos de Geração",
+    "Divisão de Manutenção de Equipamentos de Transmissão",
+    "Divisão de Manutenção Eletrônica",
+    "Divisão de Manutenção Mecânica de Serviços Auxiliares",
+    "Divisão de Manutenção Mecânica de Unidades Geradoras",
+    "Divisão de Medicina do Trabalho",
+    "Divisão de Microinformática",
+    "Divisão de Montagem Eletromecânica",
+    "Divisão de Obras Civis",
+    "Divisão de Operação da Usina e Subestações",
+    "Divisão de Operação do Sistema",
+    "Divisão de Operações Financeiras",
+    "Divisão de Planejamento de Compras",
+    "Divisão de Planejamento de Infraestrutura",
+    "Divisão de Planejamento de Sistemas",
+    "Divisão de Planejamento e Atividades Especiais",
+    "Divisão de Planejamento e Controle",
+    "Divisão de Produção",
+    "Divisão de Programação e Controle da Produção",
+    "Divisão de Programação e Controle de Produção",
+    "Divisão de Programação e Estatística",
+    "Divisão de Remuneração e Movimentação de Recursos Humanos",
+    "Divisão de Reservatório",
+    "Divisão de Segurança da Central",
+    "Divisão de Segurança Externa",
+    "Divisão de Seleção e Acompanhamento de Recursos Humanos",
+    "Divisão de Serviços",
+    "Divisão de Serviços Gerais",
+    "Divisão de Sistemas I",
+    "Divisão de Sistemas II",
+    "Divisão de Sistematização da Manutenção",
+    "Divisão de Suporte Técnico",
+    "Divisão de Tecnologia de Materiais",
+    "Divisão de Telecomunicações",
+    "Divisão de Teleprocessamento",
+    "Divisão de Transportes",
+    "Divisão Regional de Recursos Humanos",
+    "Divisão Regional de Serviços Gerais",
+    "Órgão Regional de Compras",
+    "Órgão Regional de Finanças"
+  ]
+};
 
-        matched.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'dropdown-item';
-          div.innerHTML = `<span class="item-dot"></span>${item}`;
-          div.addEventListener('mousedown', () => selectItem(item));
-          groupDiv.appendChild(div);
-          filteredItems.push({ el: div, value: item });
-        });
+let selectedEstrutura = null;
+let activeIndex = -1;
+let filteredItems = [];
 
-        dropdown.appendChild(groupDiv);
-      }
+const input = document.getElementById('estruturaInput');
+const dropdown = document.getElementById('dropdown');
+const clearBtn = document.getElementById('clearBtn');
 
-      if (filteredItems.length === 0) {
-        dropdown.innerHTML = '<div class="dropdown-empty">Nenhum resultado encontrado.</div>';
-      }
+function normalize(str) {
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
 
-      activeIndex = -1;
-    }
+function renderDropdown(query) {
+  dropdown.innerHTML = '';
+  filteredItems = [];
+  const q = normalize(query.trim());
 
-    function openDropdown() {
-      renderDropdown(input.value);
-      dropdown.classList.add('open');
-    }
+  for (const [group, items] of Object.entries(estruturas)) {
+    const matched = q === ''
+      ? items
+      : items.filter(i => normalize(i).includes(q));
 
-    function closeDropdown() {
-      dropdown.classList.remove('open');
-      activeIndex = -1;
-    }
+    if (matched.length === 0) continue;
 
-    function selectItem(value) {
-      selectedEstrutura = value;
-      input.value = value;
-      input.classList.add('valid');
-      clearBtn.style.display = 'block';
-      closeDropdown();
-      clearError('field-estrutura');
-    }
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'dropdown-group';
 
-    function clearSelection() {
-      selectedEstrutura = null;
-      input.value = '';
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'dropdown-group-label';
+    groupLabel.textContent = group;
+    groupDiv.appendChild(groupLabel);
+
+    matched.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      div.innerHTML = `<span class="item-dot"></span>${item}`;
+      div.addEventListener('mousedown', () => selectItem(item));
+      groupDiv.appendChild(div);
+      filteredItems.push({ el: div, value: item });
+    });
+
+    dropdown.appendChild(groupDiv);
+  }
+
+  if (filteredItems.length === 0) {
+    dropdown.innerHTML = '<div class="dropdown-empty">Nenhum resultado encontrado.</div>';
+  }
+
+  activeIndex = -1;
+}
+
+function openDropdown() {
+  renderDropdown(input.value);
+  dropdown.classList.add('open');
+}
+
+function closeDropdown() {
+  dropdown.classList.remove('open');
+  activeIndex = -1;
+}
+
+function selectItem(value) {
+  selectedEstrutura = value;
+  input.value = value;
+  input.classList.add('valid');
+  clearBtn.style.display = 'block';
+  closeDropdown();
+  clearError('field-estrutura');
+}
+
+function clearSelection() {
+  selectedEstrutura = null;
+  input.value = '';
+  input.classList.remove('valid');
+  clearBtn.style.display = 'none';
+  input.focus();
+}
+
+clearBtn.addEventListener('click', clearSelection);
+
+input.addEventListener('input', () => {
+  selectedEstrutura = null;
+  input.classList.remove('valid');
+  clearBtn.style.display = input.value ? 'block' : 'none';
+  openDropdown();
+});
+
+input.addEventListener('focus', openDropdown);
+
+input.addEventListener('blur', () => {
+  setTimeout(() => {
+    closeDropdown();
+    if (!selectedEstrutura) {
       input.classList.remove('valid');
-      clearBtn.style.display = 'none';
-      input.focus();
     }
+  }, 150);
+});
 
-    clearBtn.addEventListener('click', clearSelection);
+input.addEventListener('keydown', (e) => {
+  if (!dropdown.classList.contains('open')) return;
 
-    input.addEventListener('input', () => {
-      selectedEstrutura = null;
-      input.classList.remove('valid');
-      clearBtn.style.display = input.value ? 'block' : 'none';
-      openDropdown();
-    });
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, filteredItems.length - 1);
+    updateActive();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    updateActive();
+  } else if (e.key === 'Enter' && activeIndex >= 0) {
+    e.preventDefault();
+    selectItem(filteredItems[activeIndex].value);
+  } else if (e.key === 'Escape') {
+    closeDropdown();
+  }
+});
 
-    input.addEventListener('focus', openDropdown);
+function updateActive() {
+  filteredItems.forEach((item, i) => {
+    item.el.classList.toggle('active', i === activeIndex);
+    if (i === activeIndex) item.el.scrollIntoView({ block: 'nearest' });
+  });
+}
 
-    input.addEventListener('blur', () => {
-      setTimeout(() => {
-        closeDropdown();
-        if (!selectedEstrutura) {
-          input.classList.remove('valid');
-        }
-      }, 150);
-    });
+// Radio
+function selectRadio(label, value) {
+  document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+  label.classList.add('selected');
+  clearError('field-uso');
+}
 
-    input.addEventListener('keydown', (e) => {
-      if (!dropdown.classList.contains('open')) return;
+// Validation
+function setError(fieldId, msg) {
+  const field = document.getElementById(fieldId);
+  field.classList.add('has-error');
+}
 
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        activeIndex = Math.min(activeIndex + 1, filteredItems.length - 1);
-        updateActive();
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        activeIndex = Math.max(activeIndex - 1, 0);
-        updateActive();
-      } else if (e.key === 'Enter' && activeIndex >= 0) {
-        e.preventDefault();
-        selectItem(filteredItems[activeIndex].value);
-      } else if (e.key === 'Escape') {
-        closeDropdown();
-      }
-    });
+function clearError(fieldId) {
+  const field = document.getElementById(fieldId);
+  field.classList.remove('has-error');
+}
 
-    function updateActive() {
-      filteredItems.forEach((item, i) => {
-        item.el.classList.toggle('active', i === activeIndex);
-        if (i === activeIndex) item.el.scrollIntoView({ block: 'nearest' });
-      });
+function submitForm() {
+  let valid = true;
+
+  if (!selectedEstrutura) {
+    setError('field-estrutura', true);
+    valid = false;
+  } else {
+    clearError('field-estrutura');
+  }
+
+  const usoSelected = document.querySelector('input[name="uso"]:checked');
+  if (!usoSelected) {
+    document.getElementById('field-uso').classList.add('has-error');
+    document.getElementById('uso-error').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('field-uso').classList.remove('has-error');
+    document.getElementById('uso-error').style.display = 'none';
+  }
+
+  const descricao = document.getElementById('descricaoInput').value.trim();
+  if (!descricao) {
+    setError('field-descricao', true);
+    valid = false;
+  } else {
+    clearError('field-descricao');
+  }
+
+  if (!valid) return;
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Enviando…';
+  btn.disabled = true;
+
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwysFZA7vI7jPgod1BIoSmhnbTlZd5nsrgzNpFosgDaNfg52KJhOcGq4uTgLAYzws/exec';
+
+  const payload = {
+    estrutura: selectedEstrutura,
+    uso: usoSelected.value,
+    descricao
+  };
+
+  const callbackName = 'jsonpCallback_' + Date.now();
+
+  window[callbackName] = function(response) {
+    delete window[callbackName];
+    document.body.removeChild(script);
+    if (response.status === 'ok') {
+      document.getElementById('formBody').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      btn.textContent = 'Erro ao enviar. Tente novamente.';
+      btn.disabled = false;
     }
+  };
 
-    // Radio
-    function selectRadio(label, value) {
-      document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
-      label.classList.add('selected');
-      clearError('field-uso');
-    }
+  const params = new URLSearchParams({
+    callback: callbackName,
+    data: JSON.stringify(payload)
+  });
 
-    // Validation
-    function setError(fieldId, msg) {
-      const field = document.getElementById(fieldId);
-      field.classList.add('has-error');
-    }
-
-    function clearError(fieldId) {
-      const field = document.getElementById(fieldId);
-      field.classList.remove('has-error');
-    }
-
-    function submitForm() {
-      let valid = true;
-
-      if (!selectedEstrutura) {
-        setError('field-estrutura', true);
-        valid = false;
-      } else {
-        clearError('field-estrutura');
-      }
-
-      const usoSelected = document.querySelector('input[name="uso"]:checked');
-      if (!usoSelected) {
-        document.getElementById('field-uso').classList.add('has-error');
-        document.getElementById('uso-error').style.display = 'block';
-        valid = false;
-      } else {
-        document.getElementById('field-uso').classList.remove('has-error');
-        document.getElementById('uso-error').style.display = 'none';
-      }
-
-      const descricao = document.getElementById('descricaoInput').value.trim();
-      if (!descricao) {
-        setError('field-descricao', true);
-        valid = false;
-      } else {
-        clearError('field-descricao');
-      }
-
-      if (!valid) return;
-
-      const btn = document.querySelector('.submit-btn');
-      btn.textContent = 'Enviando…';
-      btn.disabled = true;
-
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgHmp3KHbvwrBwmm26GLQ_Sb2o7q7I0LCwvUAMvo3cNypUdE-VUkLvms8ZzcAqqaf0/exec';
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          estrutura: selectedEstrutura,
-          uso: usoSelected.value,
-          descricao
-        })
-      })
-        .then(() => {
-          document.getElementById('formBody').style.display = 'none';
-          document.getElementById('successMsg').style.display = 'block';
-        })
-        .catch(() => {
-          btn.textContent = 'Erro ao enviar. Tente novamente.';
-          btn.disabled = false;
-        });
-    }
-  </script>
+  const script = document.createElement('script');
+  script.src = SCRIPT_URL + '?' + params.toString();
+  script.onerror = function() {
+    delete window[callbackName];
+    document.body.removeChild(script);
+    btn.textContent = 'Erro ao enviar. Tente novamente.';
+    btn.disabled = false;
+  };
+  document.body.appendChild(script);
+}
+</script>
 </body>
-
 </html>
